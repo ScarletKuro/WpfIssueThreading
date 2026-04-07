@@ -1,0 +1,19 @@
+﻿@using WpfIssue.Services
+<Router AppAssembly="@typeof(AppBlazor).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+    <Found Context="routeData">
+        <CascadingValue Value="@SomeScope" IsFixed="true">
+            <CascadingValue Value="@BackButtonHandler" IsFixed="true">
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </CascadingValue>
+        </CascadingValue>
+    </Found>
+</Router>
+
+
+@code {
+    [Parameter] public SomeScope SomeScope { get; set; } = null!;
+
+    [Parameter]
+    public IBackButtonHandler BackButtonHandler { get; set; } = null!;
+}

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/issue/">
+    <Project Path="src/WpfNotWorking/WpfIssue.csproj" />
+  </Folder>
+  <Folder Name="/working/">
+    <Project Path="src/WpfWorking/WpfIssue.csproj" />
+  </Folder>
+  <Project Path="RazorShared/RazorShared.csproj" Id="632772d9-176a-47c2-b75a-b3b9d97ceb94" />
+</Solution>
