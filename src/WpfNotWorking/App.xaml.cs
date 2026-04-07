@@ -2,71 +2,82 @@
 using System.Windows.Threading;
 using Microsoft.Extensions.Hosting.Wpf.Core;
 using Microsoft.Extensions.Hosting.Wpf.Locator;
-using SimpleInjector;
-using WpfIssue.Services;
 
-namespace WpfIssue
+namespace WpfIssue;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application, IViewModelLocatorInitialization<IServiceProvider>, IApplicationInitializeComponent
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application, IViewModelLocatorInitialization<Container>, IApplicationInitializeComponent
+    public App()
     {
-        public App()
-        {
-            DispatcherUnhandledException += OnDispatcherUnhandledException;
-            AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
-            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-        }
+    }
 
-        public void InitializeLocator(Container container)
-        {
-            // emulating scope
-            using var scope = new Scope(container);
-            var windowService = scope.GetInstance<WindowService>();
-            windowService.ShowMainDialog();
-        }
+    public void InitializeLocator(IServiceProvider serviceProvider)
+    {
+        var mainWindow = new MainWindow(serviceProvider);
+        mainWindow.ShowDialog();
+    }
 
-        public void Initialize()
-        {
-        }
+    public void Initialize()
+    {
+    }
 
-        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            ShowFatalException("An unhandled UI exception occurred.", e.Exception);
-            e.Handled = true;
-            Shutdown(-1);
-        }
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        SetupExceptionHandling();
+        base.OnStartup(e);
+    }
 
-        private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            if (e.ExceptionObject is Exception exception)
-            {
-                ShowFatalException("A fatal application exception occurred.", exception);
-                return;
-            }
+    protected override void OnExit(ExitEventArgs e)
+    {
+        base.OnExit(e);
+        UnSetupExceptionHandling();
+    }
 
-            ShowFatalMessage("A fatal non-exception error occurred.");
-        }
+    private void UnSetupExceptionHandling()
+    {
+        AppDomain.CurrentDomain.UnhandledException -= OnCurrentDomainUnhandledException;
+        DispatcherUnhandledException -= OnDispatcherUnhandledException;
+        TaskScheduler.UnobservedTaskException -= OnUnobservedTaskException;
+    }
 
-        private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
-        {
-            ShowFatalException("An unobserved task exception occurred.", e.Exception);
-            e.SetObserved();
-        }
+    private void SetupExceptionHandling()
+    {
+        AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+    }
 
-        private static void ShowFatalException(string message, Exception exception)
-        {
-            ShowFatalMessage($"{message}{Environment.NewLine}{Environment.NewLine}{exception}");
-        }
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        ShowFatalException("An unhandled UI exception occurred.", e.Exception);
+        e.Handled = true;
+    }
 
-        private static void ShowFatalMessage(string message)
-        {
-            MessageBox.Show(
-                message,
-                "Liisu Desktop Error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-        }
+    private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        ShowFatalMessage("A fatal non-exception error occurred.");
+    }
+
+    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        ShowFatalException("An unobserved task exception occurred.", e.Exception);
+        e.SetObserved();
+    }
+
+    private void ShowFatalException(string message, Exception exception)
+    {
+        ShowFatalMessage($"{message}{Environment.NewLine}{Environment.NewLine}{exception}");
+    }
+
+    private static void ShowFatalMessage(string message)
+    {
+        MessageBox.Show(
+            message,
+            "Error",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
     }
 }

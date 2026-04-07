@@ -11,11 +11,11 @@
 
   <ItemGroup>
     <PackageReference Include="Extensions.Hosting.Wpf" Version="3.4.0" />
-    <PackageReference Include="Extensions.Hosting.Wpf.Bootstrap" Version="3.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="10.0.51" />
-    <PackageReference Include="SimpleInjector" Version="5.5.0" />
-    <PackageReference Include="SimpleInjector.Integration.GenericHost" Version="5.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RazorShared\RazorShared.csproj" />
+  </ItemGroup>
 </Project>
