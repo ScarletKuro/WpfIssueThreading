@@ -16,8 +16,25 @@ public partial class App : Application, IViewModelLocatorInitialization<IService
 
     public void InitializeLocator(IServiceProvider serviceProvider)
     {
+        // NOTE:
+        // This method runs on the UI thread.
+
         var mainWindow = new MainWindow(serviceProvider);
+
+        // Opens the main window as a modal dialog (blocks until closed)
         mainWindow.ShowDialog();
+
+        /*
+         * Notes:
+         *
+         * - Using .GetAwaiter().GetResult() here is for demonstration purposes only.
+         *   Avoid this pattern in production as it can cause deadlocks.
+         *
+         * - For more context on lifecycle and exception behavior,
+         *   see comments in Home.razor.    
+         */
+
+        //mainWindow.DisposeAsync().GetAwaiter().GetResult();
     }
 
     public void Initialize()
